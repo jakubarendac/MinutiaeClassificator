@@ -18,6 +18,7 @@ from CoarseNet_model import CoarseNetmodel, fuse_minu_orientation
 from FineNet_model import FineNetmodel
 from CoarseNet_utils import get_maximum_img_size_and_names, label2mnt, py_cpu_nms, nms
 from MinutiaeNet_utils import FastEnhanceTexture, get_maps_STFT, fuse_nms, draw_minutiae, show_orientation_field, mnt_writer
+from ClassifyNet_utils import writeMinutiaePatches
 
 coarseNetPath = '../MinutiaeNet/Models/CoarseNet.h5'
 fineNetPath = '../MinutiaeNet/Models/FineNet.h5'
@@ -148,6 +149,7 @@ for i in xrange(0, len(imgFolder)):
     #time_afterpost = time()
     mnt_writer(mnt_nms, imgFolder[i], imgSize, "%s/mnt_results/%s.mnt"%(output_dir, imgFolder[i]))
     draw_minutiae(originalImage, mnt_nms, "%s/%s_minu.png"%(output_dir, imgFolder[i]),saveimage=True)
+    writeMinutiaePatches(mnt_nms, originalImage,output_dir, imgFolder[i])
  
     misc.imsave("%s/seg_results/%s_seg.png" % (output_dir, imgFolder[i]), final_mask)
 
