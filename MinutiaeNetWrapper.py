@@ -133,6 +133,3 @@ class MinutiaeNetWrapper:
         
             final_mask = ndimage.zoom(np.round(np.squeeze(seg_out)), [8, 8], order=0)
 
-        print("predict done")
-
-

@@ -1,0 +1,11 @@
+ENDING_MINUTIAE = "ending"
+BIFURCATION_MINUTIAE = "bifurcation"
+
+PATCH_MINU_RADIO = 22
+
+# colors
+RED_COLOR = 'r'
+BLUE_COLOR = 'b'
+GREEN_COLOR = 'g'
+CYAN_COLOR = 'c'
+MAGENTA_COLOR = 'm'
