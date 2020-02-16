@@ -19,7 +19,6 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler, TensorBoard
 from keras.callbacks import ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
-from FineNet_model import FineNetmodel, plot_confusion_matrix
 from keras.utils import plot_model
 
 import numpy as np
@@ -27,6 +26,8 @@ import os
 from sklearn.metrics import confusion_matrix
 from datetime import datetime
 
+from FineNet_model import FineNetmodel, plot_confusion_matrix
+from ClassifyNet_constants import MINUTIAE_CLASSES
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '2'
 os.environ['KERAS_BACKEND'] = 'tensorflow'
@@ -41,7 +42,7 @@ log_dir = os.path.join(os.getcwd(), output_dir + '/logs')
 # Training parameters
 batch_size = 32
 epochs = 100
-num_classes = 2
+num_classes = 4
 
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
@@ -51,6 +52,8 @@ model_type = 'patch224batch32'
 
 
 # =============== DATA loading ========================
+
+# TODO : fix data paths
 
 train_path = '/home/jakub/projects/minutiae-extractor/ClassifyNet/Dataset/train/'
 test_path = '/home/jakub/projects/minutiae-extractor/ClassifyNet/Dataset/validate/'
@@ -80,14 +83,13 @@ datagen = ImageDataGenerator(
         # randomly flip images
         vertical_flip=True)
 
-train_batches = datagen.flow_from_directory(train_path, target_size=(input_shape[0], input_shape[1]), classes=['ending', 'bifurcation'], batch_size=batch_size)
+train_batches = datagen.flow_from_directory(train_path, target_size=(input_shape[0], input_shape[1]), classes=MINUTIAE_CLASSES, batch_size=batch_size)
 # Feed data from directory into batches
 test_gen = ImageDataGenerator()
-test_batches = test_gen.flow_from_directory(test_path, target_size=(input_shape[0], input_shape[1]), classes=['ending', 'bifurcation'], batch_size=batch_size)
+test_batches = test_gen.flow_from_directory(test_path, target_size=(input_shape[0], input_shape[1]), classes=MINUTIAE_CLASSES, batch_size=batch_size)
 
 
 # =============== end DATA loading ========================
-
 
 
 def lr_schedule(epoch):
@@ -106,8 +108,6 @@ def lr_schedule(epoch):
     return lr
 
 
-
-
 #============== Define model ==================
 
 model = FineNetmodel(num_classes = num_classes,
@@ -120,10 +120,12 @@ plot_model(model, to_file='./modelClassifyNet.pdf',show_shapes=True)
 for layer in model.layers:
     layer.trainable = False
 
-    # best trainings:
+    # best trainings for 2 classes:
     # 92% - mixed_7a - 50 epochs - test acc: 89%
     # 94% - mixed_6a - 50 epochs - test acc: 91%
     # 93,5% - mixed_6a - 100 epochs - test acc: 92,5%
+
+    # best trainings for 4 classes:
 
     if layer.name is "mixed_6a":
         break
@@ -134,7 +136,6 @@ model.compile(loss='categorical_crossentropy',
 #model.summary()
 
 #============== End define model ==============
-
 
 #============== Other stuffs for loging and parameters ==================
 model_name = 'ClassifyNet_%s_model.{epoch:03d}.h5' % model_type
@@ -181,5 +182,4 @@ predictions = model.predict_generator(test_batches)
 test_labels = test_batches.classes[test_batches.index_array]
 
 cm = confusion_matrix(test_labels, np.argmax(predictions,axis=1))
-cm_plot_labels = ['ending','bifurcation']
-plot_confusion_matrix(cm, cm_plot_labels, title='Confusion Matrix')
+plot_confusion_matrix(cm, MINUTIAE_CLASSES, title='Confusion Matrix')
