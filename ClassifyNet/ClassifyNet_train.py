@@ -26,8 +26,9 @@ import os
 from sklearn.metrics import confusion_matrix
 from datetime import datetime
 
-from FineNet_model import FineNetmodel, plot_confusion_matrix
+from FineNet_model import plot_confusion_matrix
 from ClassifyNet_constants import MINUTIAE_CLASSES
+from ClassifyNet_model import ClassifyNetModel
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '2'
 os.environ['KERAS_BACKEND'] = 'tensorflow'
@@ -55,8 +56,8 @@ model_type = 'patch224batch32'
 
 # TODO : fix data paths
 
-train_path = '/home/jakub/projects/minutiae-extractor/ClassifyNet/Dataset/train/'
-test_path = '/home/jakub/projects/minutiae-extractor/ClassifyNet/Dataset/validate/'
+train_path = '/home/jakub/projects/Dataset/train/'
+test_path = '/home/jakub/projects/Dataset/validate/'
 
 input_shape = (224, 224, 3)
 
@@ -110,12 +111,12 @@ def lr_schedule(epoch):
 
 #============== Define model ==================
 
-model = FineNetmodel(num_classes = num_classes,
+model = ClassifyNetModel(num_classes = num_classes,
                      pretrained_path = '../MinutiaeNet/Models/FineNet.h5',
                      input_shape=input_shape)
 
 # Save model architecture
-plot_model(model, to_file='./modelClassifyNet.pdf',show_shapes=True)
+#plot_model(model, to_file='./modelClassifyNet.pdf',show_shapes=True)
 
 for layer in model.layers:
     layer.trainable = False
@@ -169,6 +170,7 @@ callbacks = [checkpoint, lr_reducer, lr_scheduler, tensorboard]
 
 # Begin training
 model.fit_generator(train_batches,
+                    steps_per_epoch=ceil(40000 / batch_size),
                     validation_data=test_batches,
                     epochs=epochs, verbose=1,
                     callbacks=callbacks)
