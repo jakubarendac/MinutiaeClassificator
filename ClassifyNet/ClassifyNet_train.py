@@ -12,7 +12,7 @@
     }
 """
 
-import sys,os
+import sys,os,math
 sys.path.append(os.path.realpath('../MinutiaeNet/FineNet'))
 
 from keras.optimizers import Adam
@@ -30,8 +30,8 @@ from FineNet_model import plot_confusion_matrix
 from ClassifyNet_constants import MINUTIAE_CLASSES
 from ClassifyNet_model import ClassifyNetModel
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '2'
-os.environ['KERAS_BACKEND'] = 'tensorflow'
+#os.environ["CUDA_VISIBLE_DEVICES"] = '2'
+#os.environ['KERAS_BACKEND'] = 'tensorflow'
 
 
 output_dir = '../output_ClassifyNet/'+datetime.now().strftime('%Y%m%d-%H%M%S')
@@ -130,11 +130,10 @@ for layer in model.layers:
 
     if layer.name is "mixed_6a":
         break
-
 model.compile(loss='categorical_crossentropy',
               optimizer=Adam(lr=lr_schedule(0)),
               metrics=['accuracy'])
-#model.summary()
+print model.summary()
 
 #============== End define model ==============
 
@@ -170,8 +169,9 @@ callbacks = [checkpoint, lr_reducer, lr_scheduler, tensorboard]
 
 # Begin training
 model.fit_generator(train_batches,
-                    steps_per_epoch=ceil(40000 / batch_size),
+                    steps_per_epoch=math.ceil(40000 / batch_size),
                     validation_data=test_batches,
+                    validation_steps=math.ceil(4000 / batch_size),
                     epochs=epochs, verbose=1,
                     callbacks=callbacks)
 

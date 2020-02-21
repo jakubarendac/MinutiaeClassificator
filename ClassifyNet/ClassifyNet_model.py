@@ -1,3 +1,16 @@
+"""Code for FineNet in paper "Robust Minutiae Extractor: Integrating Deep Networks and Fingerprint Domain Knowledge" at ICB 2018
+  https://arxiv.org/pdf/1712.09401.pdf
+
+  If you use whole or partial function in this code, please cite paper:
+
+  @inproceedings{Nguyen_MinutiaeNet,
+    author    = {Dinh-Luan Nguyen and Kai Cao and Anil K. Jain},
+    title     = {Robust Minutiae Extractor: Integrating Deep Networks and Fingerprint Domain Knowledge},
+    booktitle = {The 11th International Conference on Biometrics, 2018},
+    year      = {2018},
+    }
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 
@@ -9,7 +22,6 @@ from keras import backend as K
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
-import h5py
 
 def preprocess_input(x):
     """Preprocesses a numpy array encoding a batch of images.
@@ -180,20 +192,20 @@ def ClassifyNetModel(num_classes = 2, pretrained_path = None, input_shape = None
     # Final convolution block: 8 x 8 x 1536
     x = conv2d_bn(x, 1536, 1, name='conv_7b')
 
+    # Classification block
+    x = GlobalAveragePooling2D(name='avg_pool')(x)
+    x = Dense(num_classes, activation='softmax', name='classification_layer')(x)
+
+
     inputs = img_input
 
     # Create model
-    model = Model(inputs, x, name='FineNet')
+    model = Model(inputs, x, name='ClassifyNet')
 
     # Load weights
     if pretrained_path != None:
         print 'Loading FineNet weights from %s'%(pretrained_path)
-
         model.load_weights(pretrained_path, by_name=True)
-
-    # Classification block
-    x = GlobalAveragePooling2D(name='avg_pool')(x)
-    x = Dense(num_classes, activation='softmax', name='predictions')(x)
 
     return model
 
