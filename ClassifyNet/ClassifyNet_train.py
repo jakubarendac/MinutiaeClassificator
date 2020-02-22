@@ -12,23 +12,25 @@
     }
 """
 
-import sys,os,math
-sys.path.append(os.path.realpath('../MinutiaeNet/FineNet'))
-
-from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint, LearningRateScheduler, TensorBoard
-from keras.callbacks import ReduceLROnPlateau
-from keras.preprocessing.image import ImageDataGenerator
-from keras.utils import plot_model
-
-import numpy as np
+import math
 import os
-from sklearn.metrics import confusion_matrix
+import sys
 from datetime import datetime
 
-from FineNet_model import plot_confusion_matrix
+import numpy as np
+from keras.callbacks import (LearningRateScheduler, ModelCheckpoint,
+                             ReduceLROnPlateau, TensorBoard)
+from keras.optimizers import Adam
+from keras.preprocessing.image import ImageDataGenerator
+from keras.utils import plot_model
+from sklearn.metrics import confusion_matrix
+
 from ClassifyNet_constants import MINUTIAE_CLASSES
 from ClassifyNet_model import ClassifyNetModel
+from FineNet_model import plot_confusion_matrix
+
+sys.path.append(os.path.realpath('../MinutiaeNet/FineNet'))
+
 
 output_dir = '../output_ClassifyNet/'+datetime.now().strftime('%Y%m%d-%H%M%S')
 
@@ -63,31 +65,33 @@ input_shape = (224, 224, 3)
 
 # Using data augmentation technique for training
 datagen = ImageDataGenerator(
-        # set input mean to 0 over the dataset
-        featurewise_center=False,
-        # set each sample mean to 0
-        samplewise_center=False,
-        # divide inputs by std of dataset
-        featurewise_std_normalization=False,
-        # divide each input by its std
-        samplewise_std_normalization=False,
-        # apply ZCA whitening
-        zca_whitening=False,
-        # randomly rotate images in the range (deg 0 to 180)
-        rotation_range=180,
-        # randomly shift images horizontally
-        width_shift_range=0.5,
-        # randomly shift images vertically
-        height_shift_range=0.5,
-        # randomly flip images
-        horizontal_flip=True,
-        # randomly flip images
-        vertical_flip=True)
+    # set input mean to 0 over the dataset
+    featurewise_center=False,
+    # set each sample mean to 0
+    samplewise_center=False,
+    # divide inputs by std of dataset
+    featurewise_std_normalization=False,
+    # divide each input by its std
+    samplewise_std_normalization=False,
+    # apply ZCA whitening
+    zca_whitening=False,
+    # randomly rotate images in the range (deg 0 to 180)
+    rotation_range=180,
+    # randomly shift images horizontally
+    width_shift_range=0.5,
+    # randomly shift images vertically
+    height_shift_range=0.5,
+    # randomly flip images
+    horizontal_flip=True,
+    # randomly flip images
+    vertical_flip=True)
 
-train_batches = datagen.flow_from_directory(train_path, target_size=(input_shape[0], input_shape[1]), classes=MINUTIAE_CLASSES, batch_size=batch_size)
+train_batches = datagen.flow_from_directory(train_path, target_size=(
+    input_shape[0], input_shape[1]), classes=MINUTIAE_CLASSES, batch_size=batch_size)
 # Feed data from directory into batches
 test_gen = ImageDataGenerator()
-test_batches = test_gen.flow_from_directory(test_path, target_size=(input_shape[0], input_shape[1]), classes=MINUTIAE_CLASSES, batch_size=batch_size)
+test_batches = test_gen.flow_from_directory(test_path, target_size=(
+    input_shape[0], input_shape[1]), classes=MINUTIAE_CLASSES, batch_size=batch_size)
 
 
 # =============== end DATA loading ========================
@@ -109,24 +113,24 @@ def lr_schedule(epoch):
     return lr
 
 
-#============== Define model ==================
+# ============== Define model ==================
 
 # TODO : before training adjust pretrained path of network
 
-model = ClassifyNetModel(num_classes = num_classes,
-                         pretrained_path = '../MinutiaeNet/Models/FineNet.h5',
+model = ClassifyNetModel(num_classes=num_classes,
+                         pretrained_path='../MinutiaeNet/Models/FineNet.h5',
                          input_shape=input_shape)
 
 # Save model architecture
 #plot_model(model, to_file='./modelClassifyNet.pdf',show_shapes=True)
 
 # best trainings for 2 classes:
-    # 92% - mixed_7a - 50 epochs - test acc: 89%
-    # 94% - mixed_6a - 50 epochs - test acc: 91%
-    # 93,5% - mixed_6a - 100 epochs - test acc: 92,5%
+# 92% - mixed_7a - 50 epochs - test acc: 89%
+# 94% - mixed_6a - 50 epochs - test acc: 91%
+# 93,5% - mixed_6a - 100 epochs - test acc: 92,5%
 
 # best trainings for 4 classes:
-    #
+#
 
 # Freeze not trainable layers
 for layer in model.layers:
@@ -140,9 +144,9 @@ model.compile(loss='categorical_crossentropy',
               metrics=['accuracy'])
 print model.summary()
 
-#============== End define model ==============
+# ============== End define model ==============
 
-#============== Other stuffs for loging and parameters ==================
+# ============== Other stuffs for loging and parameters ==================
 model_name = 'ClassifyNet_%s_model.{epoch:03d}.h5' % model_type
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
@@ -153,7 +157,8 @@ filepath = os.path.join(save_dir, model_name)
 
 
 # Show in tensorboard
-tensorboard = TensorBoard(log_dir=log_dir, histogram_freq=0, write_graph=True, write_images=False)
+tensorboard = TensorBoard(
+    log_dir=log_dir, histogram_freq=0, write_graph=True, write_images=False)
 
 # Prepare callbacks for model saving and for learning rate adjustment.
 checkpoint = ModelCheckpoint(filepath=filepath,
@@ -170,16 +175,16 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 
 callbacks = [checkpoint, lr_reducer, lr_scheduler, tensorboard]
 
-#============== End other stuffs  ==================
+# ============== End other stuffs  ==================
 
 # Begin training
 model.fit_generator(train_batches,
                     steps_per_epoch=math.ceil(train_data_count / batch_size),
                     validation_data=test_batches,
-                    validation_steps=math.ceil(validation_data_count / batch_size),
+                    validation_steps=math.ceil(
+                        validation_data_count / batch_size),
                     epochs=epochs, verbose=1,
                     callbacks=callbacks)
-
 
 
 # Plot confusion matrix
@@ -188,5 +193,5 @@ print 'Test accuracy:', score[1]
 predictions = model.predict_generator(test_batches)
 test_labels = test_batches.classes[test_batches.index_array]
 
-cm = confusion_matrix(test_labels, np.argmax(predictions,axis=1))
+cm = confusion_matrix(test_labels, np.argmax(predictions, axis=1))
 plot_confusion_matrix(cm, MINUTIAE_CLASSES, title='Confusion Matrix')

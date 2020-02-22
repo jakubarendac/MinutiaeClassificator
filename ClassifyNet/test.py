@@ -1,26 +1,32 @@
-import sys, os
+import os
+import sys
+from datetime import datetime
+
 import cv2
 import matplotlib
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+import numpy as np
+from keras.optimizers import Adam
+from scipy import misc, ndimage
+
+from ClassifyNet_utils import writeMinutiaePatches
+from ClassifyNetWrapper import ClassifyNetWrapper
+from CoarseNet_model import CoarseNetmodel, fuse_minu_orientation
+from CoarseNet_utils import (get_maximum_img_size_and_names, label2mnt, nms,
+                             py_cpu_nms)
+from FineNet_model import FineNetmodel
+from MinutiaeNet_utils import (FastEnhanceTexture, draw_minutiae, fuse_nms,
+                               get_maps_STFT, mnt_writer,
+                               show_orientation_field)
 
 matplotlib.use('Agg')
 
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import numpy as np
-from datetime import datetime
-from scipy import misc, ndimage
-from keras.optimizers import Adam
 
 sys.path.append(os.path.realpath('../MinutiaeNet/CoarseNet'))
 sys.path.append(os.path.realpath('../MinutiaeNet/FineNet'))
 sys.path.append(os.path.realpath('../'))
 
-from CoarseNet_model import CoarseNetmodel, fuse_minu_orientation
-from FineNet_model import FineNetmodel
-from CoarseNet_utils import get_maximum_img_size_and_names, label2mnt, py_cpu_nms, nms
-from MinutiaeNet_utils import FastEnhanceTexture, get_maps_STFT, fuse_nms, draw_minutiae, show_orientation_field, mnt_writer
-from ClassifyNet_utils import writeMinutiaePatches
-from ClassifyNetWrapper import ClassifyNetWrapper
 
 coarseNetPath = '../MinutiaeNet/Models/CoarseNet.h5'
 fineNetPath = '../MinutiaeNet/Models/FineNet.h5'
@@ -39,19 +45,20 @@ coarseNet = CoarseNetmodel((None, None, 1), coarseNetPath, mode='deploy')
 
 # Load FineNet model
 fineNet = FineNetmodel(num_classes=2,
-                      pretrained_path=fineNetPath,
-                      input_shape=(224,224,3))
+                       pretrained_path=fineNetPath,
+                       input_shape=(224, 224, 3))
 
 fineNet.compile(loss='categorical_crossentropy',
-               optimizer=Adam(lr=0),
-               metrics=['accuracy'])
+                optimizer=Adam(lr=0),
+                metrics=['accuracy'])
 
 classifyNet = ClassifyNetWrapper()
 
 # Predict images
 for i in xrange(0, len(imgFolder)):
-    image = misc.imread(dataPath + 'img_files/' + imgFolder[i] + '.png', mode='L')
-    
+    image = misc.imread(dataPath + 'img_files/' +
+                        imgFolder[i] + '.png', mode='L')
+
     imgSize = image.shape
     imgSize = np.array(imgSize, dtype=np.int32) // 8 * 8
     image = image[:imgSize[0], :imgSize[1]]
@@ -60,11 +67,13 @@ for i in xrange(0, len(imgFolder)):
 
     # Generate OF
     textureImg = FastEnhanceTexture(image, sigma=2.5, show=False)
-    dirMap, freMap = get_maps_STFT(textureImg, patch_size=64, block_size=16, preprocess=True)
-        
+    dirMap, freMap = get_maps_STFT(
+        textureImg, patch_size=64, block_size=16, preprocess=True)
+
     image = np.reshape(image, [1, image.shape[0], image.shape[1], 1])
 
-    enh_img, enh_img_imag, enhance_img, ori_out_1, ori_out_2, seg_out, mnt_o_out, mnt_w_out, mnt_h_out, mnt_s_out = coarseNet.predict(image)
+    enh_img, enh_img_imag, enhance_img, ori_out_1, ori_out_2, seg_out, mnt_o_out, mnt_w_out, mnt_h_out, mnt_s_out = coarseNet.predict(
+        image)
 
     # Use for output mask
     round_seg = np.round(np.squeeze(seg_out))
@@ -109,11 +118,13 @@ for i in xrange(0, len(imgFolder)):
                 x_begin = int(mnt_nms[idx_minu, 1]) - patch_minu_radio
                 y_begin = int(mnt_nms[idx_minu, 0]) - patch_minu_radio
                 patch_minu = originalImage[x_begin:x_begin + 2 * patch_minu_radio,
-                             y_begin:y_begin + 2 * patch_minu_radio]
+                                           y_begin:y_begin + 2 * patch_minu_radio]
 
-                patch_minu = cv2.resize(patch_minu, dsize=(224, 224), interpolation=cv2.INTER_NEAREST)
+                patch_minu = cv2.resize(patch_minu, dsize=(
+                    224, 224), interpolation=cv2.INTER_NEAREST)
 
-                ret = np.empty((patch_minu.shape[0], patch_minu.shape[1], 3), dtype=np.uint8)
+                ret = np.empty(
+                    (patch_minu.shape[0], patch_minu.shape[1], 3), dtype=np.uint8)
                 ret[:, :, 0] = patch_minu
                 ret[:, :, 1] = patch_minu
                 ret[:, :, 2] = patch_minu
@@ -133,7 +144,7 @@ for i in xrange(0, len(imgFolder)):
                 # print isMinutiaeProb
 
                 minutiaeType = None
-              
+
                 if(isMinutiaeProb):
                     minutiaeType = classifyNet.predictImage(patch_minu)
 
@@ -143,26 +154,31 @@ for i in xrange(0, len(imgFolder)):
                 mnt_refined.append(tmp_mnt)
 
             except:
-               mnt_refined.append(mnt_nms[idx_minu, :])
-    
+                mnt_refined.append(mnt_nms[idx_minu, :])
+
     mnt_nms_backup = mnt_nms.copy()
     mnt_nms = np.array(mnt_refined)
 
     if mnt_nms.shape[0] > 0:
         mnt_nms = mnt_nms[mnt_nms[:, 3] > final_minutiae_score_threashold, :]
-        
-        final_mask = ndimage.zoom(np.round(np.squeeze(seg_out)), [8, 8], order=0)
+
+        final_mask = ndimage.zoom(
+            np.round(np.squeeze(seg_out)), [8, 8], order=0)
 
     # Show the orientation
-    show_orientation_field(originalImage, dirMap + np.pi, mask=final_mask, fname=None)
+    show_orientation_field(originalImage, dirMap + np.pi,
+                           mask=final_mask, fname=None)
 
     fuse_minu_orientation(dirMap, mnt_nms, mode=3)
 
     #time_afterpost = time()
-    mnt_writer(mnt_nms, imgFolder[i], imgSize, "%s/mnt_results/%s.mnt"%(output_dir, imgFolder[i]))
-    draw_minutiae(originalImage, mnt_nms, "%s/%s_minu.png"%(output_dir, imgFolder[i]),saveimage=True, drawScore=True)
-    writeMinutiaePatches(mnt_nms, originalImage,output_dir, imgFolder[i])
+    mnt_writer(mnt_nms, imgFolder[i], imgSize,
+               "%s/mnt_results/%s.mnt" % (output_dir, imgFolder[i]))
+    draw_minutiae(originalImage, mnt_nms, "%s/%s_minu.png" %
+                  (output_dir, imgFolder[i]), saveimage=True, drawScore=True)
+    writeMinutiaePatches(mnt_nms, originalImage, output_dir, imgFolder[i])
 
-    misc.imsave("%s/seg_results/%s_seg.png" % (output_dir, imgFolder[i]), final_mask)
+    misc.imsave("%s/seg_results/%s_seg.png" %
+                (output_dir, imgFolder[i]), final_mask)
 
 print('preslo')
