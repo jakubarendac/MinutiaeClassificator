@@ -15,16 +15,17 @@ classifyNetPath = '/home/jakub/projects/minutiae-extractor/ClassifyNet/Models/Cl
 
 class ClassifyNetWrapper:
     def __init__(self):
-        self.classifyNet = ClassifyNetModel(num_classes=NUM_CLASSES,
+        # Load ClassifyNet model
+        self.__classifyNet = ClassifyNetModel(num_classes=NUM_CLASSES,
                                             pretrained_path=classifyNetPath,
                                             input_shape=INPUT_SHAPE)
 
-        self.classifyNet.compile(loss='categorical_crossentropy',
+        self.__classifyNet.compile(loss='categorical_crossentropy',
                                  optimizer=Adam(lr=0),
                                  metrics=['accuracy'])
 
     def predictImage(self, image):
-        [minutiaeClasses] = self.classifyNet.predict(image)
+        [minutiaeClasses] = self.__classifyNet.predict(image)
 
         numpyMinutiaeClasses = np.array(minutiaeClasses)
         maxValueIndex = np.argmax(numpyMinutiaeClasses)
