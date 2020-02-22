@@ -11,6 +11,8 @@
     }
 """
 
+# ClassifyNet is based on FineNet - CNN described in article above
+
 from __future__ import absolute_import
 from __future__ import division
 

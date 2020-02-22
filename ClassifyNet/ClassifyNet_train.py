@@ -30,20 +30,20 @@ from FineNet_model import plot_confusion_matrix
 from ClassifyNet_constants import MINUTIAE_CLASSES
 from ClassifyNet_model import ClassifyNetModel
 
-#os.environ["CUDA_VISIBLE_DEVICES"] = '2'
-#os.environ['KERAS_BACKEND'] = 'tensorflow'
-
-
 output_dir = '../output_ClassifyNet/'+datetime.now().strftime('%Y%m%d-%H%M%S')
 
 # Prepare model model saving directory.
 save_dir = os.path.join(os.getcwd(), output_dir)
 log_dir = os.path.join(os.getcwd(), output_dir + '/logs')
 
+# TODO : before training adjust training parameters
+
 # Training parameters
 batch_size = 32
 epochs = 100
 num_classes = 4
+train_data_count = 40000
+validation_data_count = 4000
 
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
@@ -54,7 +54,7 @@ model_type = 'patch224batch32'
 
 # =============== DATA loading ========================
 
-# TODO : fix data paths
+# TODO : before training adjust data paths
 
 train_path = '/home/jakub/projects/Dataset/train/'
 test_path = '/home/jakub/projects/Dataset/validate/'
@@ -111,25 +111,30 @@ def lr_schedule(epoch):
 
 #============== Define model ==================
 
+# TODO : before training adjust pretrained path of network
+
 model = ClassifyNetModel(num_classes = num_classes,
-                     pretrained_path = '../MinutiaeNet/Models/FineNet.h5',
-                     input_shape=input_shape)
+                         pretrained_path = '../MinutiaeNet/Models/FineNet.h5',
+                         input_shape=input_shape)
 
 # Save model architecture
 #plot_model(model, to_file='./modelClassifyNet.pdf',show_shapes=True)
 
-for layer in model.layers:
-    layer.trainable = False
-
-    # best trainings for 2 classes:
+# best trainings for 2 classes:
     # 92% - mixed_7a - 50 epochs - test acc: 89%
     # 94% - mixed_6a - 50 epochs - test acc: 91%
     # 93,5% - mixed_6a - 100 epochs - test acc: 92,5%
 
-    # best trainings for 4 classes:
+# best trainings for 4 classes:
+    #
+
+# Freeze not trainable layers
+for layer in model.layers:
+    layer.trainable = False
 
     if layer.name is "mixed_6a":
         break
+
 model.compile(loss='categorical_crossentropy',
               optimizer=Adam(lr=lr_schedule(0)),
               metrics=['accuracy'])
@@ -169,9 +174,9 @@ callbacks = [checkpoint, lr_reducer, lr_scheduler, tensorboard]
 
 # Begin training
 model.fit_generator(train_batches,
-                    steps_per_epoch=math.ceil(40000 / batch_size),
+                    steps_per_epoch=math.ceil(train_data_count / batch_size),
                     validation_data=test_batches,
-                    validation_steps=math.ceil(4000 / batch_size),
+                    validation_steps=math.ceil(validation_data_count / batch_size),
                     epochs=epochs, verbose=1,
                     callbacks=callbacks)
 
