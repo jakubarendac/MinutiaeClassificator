@@ -10,6 +10,10 @@ import numpy as np
 from keras.optimizers import Adam
 from scipy import misc, ndimage
 
+sys.path.append(os.path.realpath('../MinutiaeNet/CoarseNet'))
+sys.path.append(os.path.realpath('../MinutiaeNet/FineNet'))
+sys.path.append(os.path.realpath('../'))
+
 from ClassifyNet_utils import writeMinutiaePatches
 from ClassifyNetWrapper import ClassifyNetWrapper
 from CoarseNet_model import CoarseNetmodel, fuse_minu_orientation
@@ -21,12 +25,6 @@ from MinutiaeNet_utils import (FastEnhanceTexture, draw_minutiae, fuse_nms,
                                show_orientation_field)
 
 matplotlib.use('Agg')
-
-
-sys.path.append(os.path.realpath('../MinutiaeNet/CoarseNet'))
-sys.path.append(os.path.realpath('../MinutiaeNet/FineNet'))
-sys.path.append(os.path.realpath('../'))
-
 
 coarseNetPath = '../MinutiaeNet/Models/CoarseNet.h5'
 fineNetPath = '../MinutiaeNet/Models/FineNet.h5'
@@ -57,7 +55,7 @@ classifyNet = ClassifyNetWrapper()
 # Predict images
 for i in xrange(0, len(imgFolder)):
     image = misc.imread(dataPath + 'img_files/' +
-                        imgFolder[i] + '.png', mode='L')
+                        imgFolder[i] + '.tif', mode='L')
 
     imgSize = image.shape
     imgSize = np.array(imgSize, dtype=np.int32) // 8 * 8
@@ -146,7 +144,8 @@ for i in xrange(0, len(imgFolder)):
                 minutiaeType = None
 
                 if(isMinutiaeProb):
-                    minutiaeType = classifyNet.predictImage(patch_minu)
+                    minutiaeType = classifyNet.classify_minutiae(patch_minu)
+                    #print minutiaeType
 
                 tmp_mnt = mnt_nms[idx_minu, :].copy()
                 tmp_mnt[3] = (4*tmp_mnt[3] + isMinutiaeProb) / 5
@@ -174,11 +173,11 @@ for i in xrange(0, len(imgFolder)):
     #time_afterpost = time()
     mnt_writer(mnt_nms, imgFolder[i], imgSize,
                "%s/mnt_results/%s.mnt" % (output_dir, imgFolder[i]))
-    draw_minutiae(originalImage, mnt_nms, "%s/%s_minu.png" %
+    draw_minutiae(originalImage, mnt_nms, "%s/%s_minu.tif" %
                   (output_dir, imgFolder[i]), saveimage=True, drawScore=True)
     writeMinutiaePatches(mnt_nms, originalImage, output_dir, imgFolder[i])
 
-    misc.imsave("%s/seg_results/%s_seg.png" %
+    misc.imsave("%s/seg_results/%s_seg.tif" %
                 (output_dir, imgFolder[i]), final_mask)
 
 print('preslo')

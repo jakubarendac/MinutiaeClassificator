@@ -1,9 +1,9 @@
-from MinutiaeNetWrapper import MinutiaeNetWrapper
+from MinutiaeExtractorWrapper import MinutiaeExtractorWrapper
+
 
 def main():
-    minutiaeNet = MinutiaeNetWrapper()
-    minutiaeNet.readImage("./ClassifyNet/testData/img_files/crd_0208s_01.png")
-    minutiaeNet.predictImage()  
-  
-if __name__== "__main__":
+    minutiae_extractor = MinutiaeExtractorWrapper()
+    minutiae_extractor.get_classified_minutiae('/home/jakub/projects/minutiae-extractor/ClassifyNet/testData/img_files/93_5.tif')
+
+if __name__ == "__main__":
     main()

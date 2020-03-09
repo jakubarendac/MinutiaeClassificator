@@ -109,7 +109,7 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
     return x
 
 
-def ClassifyNetModel(num_classes=2, pretrained_path=None, input_shape=None):
+def ClassifyNetModel(num_classes=2, pretrained_path=None, input_shape=None, load_layers_by_name = False):
     """Create FineNet architecture.
 
     """
@@ -208,8 +208,8 @@ def ClassifyNetModel(num_classes=2, pretrained_path=None, input_shape=None):
 
     # Load weights
     if pretrained_path != None:
-        print 'Loading FineNet weights from %s' % (pretrained_path)
-        model.load_weights(pretrained_path, by_name=True)
+        print 'Loading ClassifyNet weights from %s' % (pretrained_path)
+        model.load_weights(pretrained_path, by_name=load_layers_by_name)
 
     return model
 

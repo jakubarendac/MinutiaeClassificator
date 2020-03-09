@@ -32,7 +32,7 @@ from FineNet_model import plot_confusion_matrix
 sys.path.append(os.path.realpath('../MinutiaeNet/FineNet'))
 
 
-output_dir = '../output_ClassifyNet/'+datetime.now().strftime('%Y%m%d-%H%M%S')
+output_dir = './output_ClassifyNet/'+datetime.now().strftime('%Y%m%d-%H%M%S')
 
 # Prepare model model saving directory.
 save_dir = os.path.join(os.getcwd(), output_dir)
@@ -119,7 +119,8 @@ def lr_schedule(epoch):
 
 model = ClassifyNetModel(num_classes=num_classes,
                          pretrained_path='../MinutiaeNet/Models/FineNet.h5',
-                         input_shape=input_shape)
+                         input_shape=input_shape,
+                         load_layers_by_name=True)
 
 # Save model architecture
 #plot_model(model, to_file='./modelClassifyNet.pdf',show_shapes=True)
