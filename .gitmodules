@@ -1,0 +1,3 @@
+[submodule "MinutiaeNet"]
+	path = MinutiaeNet
+	url = https://github.com/jakubarendac/MinutiaeNet.git
