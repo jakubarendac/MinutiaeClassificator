@@ -1,0 +1,1 @@
+from MinutiaeExtractor.MinutiaeExtractorWrapper import MinutiaeExtractorWrapper
