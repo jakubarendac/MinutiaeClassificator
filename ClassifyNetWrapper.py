@@ -5,8 +5,8 @@ import cv2
 import numpy as np
 from keras.optimizers import Adam
 
-sys.path.append(os.path.realpath('./ClassifyNet'))
-sys.path.append(os.path.realpath('./constants'))
+sys.path.append(os.path.realpath('MinutiaeClassificator/ClassifyNet'))
+sys.path.append(os.path.realpath('MinutiaeClassificator/constants'))
 
 from ClassifyNet_model import ClassifyNetModel
 from ClassifyNet_constants import INPUT_SHAPE, NUM_CLASSES, PATCH_MINU_RADIO

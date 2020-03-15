@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from keras.optimizers import Adam
 
-sys.path.append(os.path.realpath('./MinutiaeNet/CoarseNet'))
-sys.path.append(os.path.realpath('./MinutiaeNet/FineNet'))
-sys.path.append(os.path.realpath('./constants'))
+sys.path.append(os.path.realpath('MinutiaeClassificator/MinutiaeNet/CoarseNet'))
+sys.path.append(os.path.realpath('MinutiaeClassificator/MinutiaeNet/FineNet'))
+sys.path.append(os.path.realpath('MinutiaeClassificator/constants'))
 
 from MinutiaeNet_utils import FastEnhanceTexture, get_maps_STFT, fuse_nms
 from CoarseNet_utils import label2mnt, py_cpu_nms, nms

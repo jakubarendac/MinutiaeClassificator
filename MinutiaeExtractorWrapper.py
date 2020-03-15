@@ -3,9 +3,9 @@ import sys
 
 import numpy as np
 
-sys.path.append(os.path.realpath('./utils'))
-sys.path.append(os.path.realpath('./MinutiaeNet/CoarseNet'))
-sys.path.append(os.path.realpath('./MinutiaeNet/FineNet'))
+sys.path.append(os.path.realpath('MinutiaeClassificator/utils'))
+sys.path.append(os.path.realpath('MinutiaeClassificator/MinutiaeNet/CoarseNet'))
+sys.path.append(os.path.realpath('MinutiaeClassificator/MinutiaeNet/FineNet'))
 
 from ClassifyNetWrapper import ClassifyNetWrapper
 from image_utils import read_image, show_image
