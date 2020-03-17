@@ -7,14 +7,13 @@ from keras.optimizers import Adam
 
 from MinutiaeClassificator.ClassifyNet.ClassifyNet_model import ClassifyNetModel
 from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import INPUT_SHAPE, NUM_CLASSES, PATCH_MINU_RADIO
-from MinutiaeClassificator.constants.MinutiaeExtractor_constants import CLASSIFY_NET_PATH
 
 
 class ClassifyNetWrapper:
-    def __init__(self):
+    def __init__(self, classify_net_path):
         # Load ClassifyNet model
         self.__classifyNet = ClassifyNetModel(num_classes=NUM_CLASSES,
-                                              pretrained_path=CLASSIFY_NET_PATH,
+                                              pretrained_path=classify_net_path,
                                               input_shape=INPUT_SHAPE)
 
         self.__classifyNet.compile(loss='categorical_crossentropy',

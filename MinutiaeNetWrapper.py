@@ -12,17 +12,17 @@ from MinutiaeClassificator.MinutiaeNet.CoarseNet.CoarseNet_utils import label2mn
 from MinutiaeClassificator.MinutiaeNet.FineNet.FineNet_model import FineNetmodel
 from MinutiaeClassificator.MinutiaeNet.CoarseNet.CoarseNet_model import CoarseNetmodel, fuse_minu_orientation
 from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import PATCH_MINU_RADIO, INPUT_SHAPE
-from MinutiaeClassificator.constants.MinutiaeExtractor_constants import COARSE_NET_PATH, FINE_NET_PATH
+
 
 class MinutiaeNetWrapper:
-    def __init__(self):
+    def __init__(self, coarse_net_path, fine_net_path):
         # Load CoarseNet model
         self.__coarse_net = CoarseNetmodel(
-            (None, None, 1), COARSE_NET_PATH, mode='deploy')
+            (None, None, 1), coarse_net_path, mode='deploy')
 
         # Load FineNet model
         self.__fine_net = FineNetmodel(num_classes=2,
-                                       pretrained_path=FINE_NET_PATH,
+                                       pretrained_path=fine_net_path,
                                        input_shape=INPUT_SHAPE)
 
         self.__fine_net.compile(loss='categorical_crossentropy',
