@@ -3,14 +3,10 @@ import sys
 
 import numpy as np
 
-sys.path.append(os.path.realpath('MinutiaeClassificator/utils'))
-sys.path.append(os.path.realpath('MinutiaeClassificator/MinutiaeNet/CoarseNet'))
-sys.path.append(os.path.realpath('MinutiaeClassificator/MinutiaeNet/FineNet'))
-
-from ClassifyNetWrapper import ClassifyNetWrapper
-from image_utils import read_image, show_image
-from MinutiaeNetWrapper import MinutiaeNetWrapper
-from MinutiaeNet_utils import draw_minutiae
+from MinutiaeClassificator.ClassifyNetWrapper import ClassifyNetWrapper
+from MinutiaeClassificator.utils.image_utils import read_image, show_image
+from MinutiaeClassificator.MinutiaeNetWrapper import MinutiaeNetWrapper
+from MinutiaeClassificator.MinutiaeNet.CoarseNet.MinutiaeNet_utils import draw_minutiae
 
 
 class MinutiaeExtractorWrapper:
@@ -18,6 +14,7 @@ class MinutiaeExtractorWrapper:
 
         self.__extraction_module = MinutiaeNetWrapper()
         self.__classification_module = ClassifyNetWrapper()
+        print 'nacitalo minutiae extractor'
 
     def __extract_minutiae(self, image, original_image):
         extracted_minutiae = self.__extraction_module.extract_minutiae(image, original_image)

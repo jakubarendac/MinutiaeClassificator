@@ -25,11 +25,9 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import plot_model
 from sklearn.metrics import confusion_matrix
 
-from ClassifyNet_constants import MINUTIAE_CLASSES
-from ClassifyNet_model import ClassifyNetModel
-from FineNet_model import plot_confusion_matrix
-
-sys.path.append(os.path.realpath('../MinutiaeNet/FineNet'))
+from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import MINUTIAE_CLASSES
+from MinutiaeClassificator.ClassifyNet.ClassifyNet_model import ClassifyNetModel
+from MinutiaeClassificator.MinutiaeNet.FineNet.FineNet_model import plot_confusion_matrix
 
 
 output_dir = './output_ClassifyNet/'+datetime.now().strftime('%Y%m%d-%H%M%S')

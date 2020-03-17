@@ -1,5 +1,3 @@
-import sys
-import os
 import cv2
 import numpy as np
 
@@ -9,16 +7,12 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from keras.optimizers import Adam
 
-sys.path.append(os.path.realpath('MinutiaeClassificator/MinutiaeNet/CoarseNet'))
-sys.path.append(os.path.realpath('MinutiaeClassificator/MinutiaeNet/FineNet'))
-sys.path.append(os.path.realpath('MinutiaeClassificator/constants'))
-
-from MinutiaeNet_utils import FastEnhanceTexture, get_maps_STFT, fuse_nms
-from CoarseNet_utils import label2mnt, py_cpu_nms, nms
-from FineNet_model import FineNetmodel
-from CoarseNet_model import CoarseNetmodel, fuse_minu_orientation
-from ClassifyNet_constants import PATCH_MINU_RADIO, INPUT_SHAPE
-from MinutiaeExtractor_constants import COARSE_NET_PATH, FINE_NET_PATH
+from MinutiaeClassificator.MinutiaeNet.CoarseNet.MinutiaeNet_utils import FastEnhanceTexture, get_maps_STFT, fuse_nms
+from MinutiaeClassificator.MinutiaeNet.CoarseNet.CoarseNet_utils import label2mnt, py_cpu_nms, nms
+from MinutiaeClassificator.MinutiaeNet.FineNet.FineNet_model import FineNetmodel
+from MinutiaeClassificator.MinutiaeNet.CoarseNet.CoarseNet_model import CoarseNetmodel, fuse_minu_orientation
+from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import PATCH_MINU_RADIO, INPUT_SHAPE
+from MinutiaeClassificator.constants.MinutiaeExtractor_constants import COARSE_NET_PATH, FINE_NET_PATH
 
 class MinutiaeNetWrapper:
     def __init__(self):
