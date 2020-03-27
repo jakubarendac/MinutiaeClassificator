@@ -31,8 +31,13 @@ class ClassifyNetWrapper:
                 patch_minu = image[x_begin:x_begin + 2 * PATCH_MINU_RADIO,
                                             y_begin:y_begin + 2 * PATCH_MINU_RADIO]
 
-                patch_minu = cv2.resize(patch_minu, dsize=(
-                   224, 224), interpolation=cv2.INTER_NEAREST)
+                try:
+                    patch_minu = cv2.resize(patch_minu, dsize=(
+                        224, 224), interpolation=cv2.INTER_NEAREST)
+                except Exception as e:
+                    # TODO : add some reasonable code here - programme will fail on next step
+                    print(str(e))
+                    
                 ret = np.empty((patch_minu.shape[0], patch_minu.shape[1], 3), dtype=np.uint8)
                 ret[:, :, 0] = patch_minu
                 ret[:, :, 1] = patch_minu

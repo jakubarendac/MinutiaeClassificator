@@ -81,36 +81,39 @@ class MinutiaeNetWrapper:
         mnt_refined = []
 
         # ======= Verify using FineNet ============
-        if FINE_NET_PATH is not None:
-            for idx_minu in range(mnt_nms.shape[0]):
-                try:
-                    # Extract patch from image
-                    x_begin = int(mnt_nms[idx_minu, 1]) - PATCH_MINU_RADIO
-                    y_begin = int(mnt_nms[idx_minu, 0]) - PATCH_MINU_RADIO
-                    patch_minu = original_image[x_begin:x_begin + 2 *
-                                                PATCH_MINU_RADIO, y_begin:y_begin + 2 * PATCH_MINU_RADIO]
+        for idx_minu in range(mnt_nms.shape[0]):
+            try:
+                # Extract patch from image
+                x_begin = int(mnt_nms[idx_minu, 1]) - PATCH_MINU_RADIO
+                y_begin = int(mnt_nms[idx_minu, 0]) - PATCH_MINU_RADIO
+                patch_minu = original_image[x_begin:x_begin + 2 *
+                                            PATCH_MINU_RADIO, y_begin:y_begin + 2 * PATCH_MINU_RADIO]
 
+                try:
                     patch_minu = cv2.resize(patch_minu, dsize=(
                         224, 224), interpolation=cv2.INTER_NEAREST)
+                except Exception as e:
+                    # TODO : add some reasonable code here - programme will fail on next step
+                    print(str(e))
 
-                    ret = np.empty(
-                        (patch_minu.shape[0], patch_minu.shape[1], 3), dtype=np.uint8)
-                    ret[:, :, 0] = patch_minu
-                    ret[:, :, 1] = patch_minu
-                    ret[:, :, 2] = patch_minu
-                    patch_minu = ret
-                    patch_minu = np.expand_dims(patch_minu, axis=0)
+                ret = np.empty(
+                    (patch_minu.shape[0], patch_minu.shape[1], 3), dtype=np.uint8)
+                ret[:, :, 0] = patch_minu
+                ret[:, :, 1] = patch_minu
+                ret[:, :, 2] = patch_minu
+                patch_minu = ret
+                patch_minu = np.expand_dims(patch_minu, axis=0)
 
-                    # Use soft decision: merge FineNet score with CoarseNet score
-                    [is_minutiae_prob] = self.__fine_net.predict(patch_minu)
-                    is_minutiae_prob = is_minutiae_prob[0]
+                # Use soft decision: merge FineNet score with CoarseNet score
+                [is_minutiae_prob] = self.__fine_net.predict(patch_minu)
+                is_minutiae_prob = is_minutiae_prob[0]
 
-                    tmp_mnt = mnt_nms[idx_minu, :].copy()
-                    tmp_mnt[3] = (4*tmp_mnt[3] + is_minutiae_prob) / 5
-                    mnt_refined.append(tmp_mnt)
+                tmp_mnt = mnt_nms[idx_minu, :].copy()
+                tmp_mnt[3] = (4*tmp_mnt[3] + is_minutiae_prob) / 5
+                mnt_refined.append(tmp_mnt)
 
-                except BaseException:
-                    mnt_refined.append(mnt_nms[idx_minu, :])
+            except BaseException:
+                mnt_refined.append(mnt_nms[idx_minu, :])
 
         mnt_nms_backup = mnt_nms.copy()
         mnt_nms = np.array(mnt_refined)
