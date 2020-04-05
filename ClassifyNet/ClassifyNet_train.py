@@ -43,9 +43,9 @@ log_dir = os.path.join(os.getcwd(), output_dir + '/logs')
 # Training parameters
 batch_size = 32
 epochs = 100
-num_classes = 4
-train_data_count = 40000
-validation_data_count = 4000
+num_classes = 5
+train_data_count = 50000
+validation_data_count = 5000
 
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
@@ -132,6 +132,9 @@ model = ClassifyNetModel(num_classes=num_classes,
 
 # best trainings for 4 classes:
 #
+
+# best trainings for 5 classes:
+# 
 
 # Freeze not trainable layers
 for layer in model.layers:
