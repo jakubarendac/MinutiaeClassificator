@@ -36,24 +36,30 @@ class MinutiaeExtractorWrapper:
     def load_classification_module(self):
         self.__classification_module = ClassifyNetWrapper(self.__classify_net_path)
 
-    def get_classified_minutiae(self, image_path):
+    def get_classified_minutiae(self, image_path, as_image = True):
         image = read_image(image_path)
 
         extracted_minutiae = self.__extract_minutiae(image['image'], image['original_image'])
         classified_minutiae = self.__classify_minutiae(image['original_image'], extracted_minutiae)
 
-        image_data = draw_minutiae(image['original_image'], classified_minutiae, 15, True)
+        if as_image:
+            image_data = draw_minutiae(image['original_image'], classified_minutiae, 15, True)
 
-        return image_data
+            return image_data
 
-    def get_extracted_minutiae(self, image_path):
+        return classified_minutiae
+
+    def get_extracted_minutiae(self, image_path, as_image = True):
         image = read_image(image_path)
 
         extracted_minutiae = self.__extract_minutiae(image['image'], image['original_image'])
 
-        image_data = draw_minutiae(image['original_image'], extracted_minutiae, 15, True)
+        if as_image:
+            image_data = draw_minutiae(image['original_image'], extracted_minutiae, 15, True)
 
-        return image_data
+            return image_data
+
+        return extracted_minutiae
 
 
 
