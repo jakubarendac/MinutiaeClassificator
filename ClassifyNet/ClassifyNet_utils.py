@@ -6,7 +6,7 @@ import cv2
 from ClassifyNet_constants import (BIFURCATION_MINUTIAE, BLUE_COLOR,
                                    CYAN_COLOR, ENDING_MINUTIAE,
                                    FRAGMENT_MINUTIAE, GREEN_COLOR,
-                                   OTHER_MINUTIAE, PATCH_MINU_RADIO, RED_COLOR)
+                                   OTHER_MINUTIAE, ENCLOSURE_MINUTIAE, MAGENTA_COLOR, PATCH_MINU_RADIO, RED_COLOR, CROSSBAR_MINUTIAE, YELLOW_COLOR)
 
 
 def writeMinutiaePatches(mnt_nms, originalImage, output_dir, imageName):
@@ -27,7 +27,9 @@ def getMinutiaeTypeFromId(minutiaeId):
         0: ENDING_MINUTIAE,
         1: BIFURCATION_MINUTIAE,
         2: FRAGMENT_MINUTIAE,
-        3: OTHER_MINUTIAE
+        3: ENCLOSURE_MINUTIAE,
+        4: CROSSBAR_MINUTIAE,
+        5: OTHER_MINUTIAE
     }
 
     return switcher.get(minutiaeId, None)
@@ -38,7 +40,9 @@ def setMinutiaePlotColor(minutiaeType):
         ENDING_MINUTIAE: RED_COLOR,
         BIFURCATION_MINUTIAE: GREEN_COLOR,
         FRAGMENT_MINUTIAE: BLUE_COLOR,
-        OTHER_MINUTIAE: CYAN_COLOR
+        ENCLOSURE_MINUTIAE: CYAN_COLOR,
+        CROSSBAR_MINUTIAE: YELLOW_COLOR,
+        OTHER_MINUTIAE: MAGENTA_COLOR
     }
 
-    return switcher.get(minutiaeType, CYAN_COLOR)
+    return switcher.get(minutiaeType, MAGENTA_COLOR)
