@@ -5,19 +5,15 @@ import cv2
 import numpy as np
 from keras.optimizers import Adam
 
-sys.path.append(os.path.realpath('./ClassifyNet'))
-sys.path.append(os.path.realpath('./constants'))
-
-from ClassifyNet_model import ClassifyNetModel
-from ClassifyNet_constants import INPUT_SHAPE, NUM_CLASSES, PATCH_MINU_RADIO
-from MinutiaeExtractor_constants import CLASSIFY_NET_PATH
+from MinutiaeClassificator.ClassifyNet.ClassifyNet_model import ClassifyNetModel
+from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import INPUT_SHAPE, NUM_CLASSES, PATCH_MINU_RADIO
 
 
 class ClassifyNetWrapper:
-    def __init__(self):
+    def __init__(self, classify_net_path):
         # Load ClassifyNet model
         self.__classifyNet = ClassifyNetModel(num_classes=NUM_CLASSES,
-                                              pretrained_path=CLASSIFY_NET_PATH,
+                                              pretrained_path=classify_net_path,
                                               input_shape=INPUT_SHAPE)
 
         self.__classifyNet.compile(loss='categorical_crossentropy',
@@ -35,8 +31,13 @@ class ClassifyNetWrapper:
                 patch_minu = image[x_begin:x_begin + 2 * PATCH_MINU_RADIO,
                                             y_begin:y_begin + 2 * PATCH_MINU_RADIO]
 
-                patch_minu = cv2.resize(patch_minu, dsize=(
-                   224, 224), interpolation=cv2.INTER_NEAREST)
+                try:
+                    patch_minu = cv2.resize(patch_minu, dsize=(
+                        224, 224), interpolation=cv2.INTER_NEAREST)
+                except Exception as e:
+                    # TODO : add some reasonable code here - programme will fail on next step
+                    print(str(e))
+                    
                 ret = np.empty((patch_minu.shape[0], patch_minu.shape[1], 3), dtype=np.uint8)
                 ret[:, :, 0] = patch_minu
                 ret[:, :, 1] = patch_minu

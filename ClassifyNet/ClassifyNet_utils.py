@@ -3,7 +3,7 @@ import sys
 
 import cv2
 
-from ClassifyNet_constants import (BIFURCATION_MINUTIAE, BLUE_COLOR,
+from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import (BIFURCATION_MINUTIAE, BLUE_COLOR,
                                    CYAN_COLOR, ENDING_MINUTIAE,
                                    FRAGMENT_MINUTIAE, GREEN_COLOR,
                                    OTHER_MINUTIAE, PATCH_MINU_RADIO, RED_COLOR)
