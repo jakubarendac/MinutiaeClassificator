@@ -25,10 +25,9 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import plot_model
 from sklearn.metrics import confusion_matrix
 
-from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import MINUTIAE_CLASSES
+from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import MINUTIAE_CLASSES, NUM_CLASSES
 from MinutiaeClassificator.ClassifyNet.ClassifyNet_model import ClassifyNetModel
 from MinutiaeClassificator.MinutiaeNet.FineNet.FineNet_model import plot_confusion_matrix
-
 
 output_dir = './output_ClassifyNet/'+datetime.now().strftime('%Y%m%d-%H%M%S')
 
@@ -40,10 +39,10 @@ log_dir = os.path.join(os.getcwd(), output_dir + '/logs')
 
 # Training parameters
 batch_size = 32
-epochs = 100
-num_classes = 4
-train_data_count = 40000
-validation_data_count = 4000
+epochs = 200
+num_classes = NUM_CLASSES
+train_data_count = 60000
+validation_data_count = 6000
 
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
@@ -130,6 +129,12 @@ model = ClassifyNetModel(num_classes=num_classes,
 
 # best trainings for 4 classes:
 #
+
+# best trainings for 5 classes:
+# 
+
+# best trainings for 6 classes:
+# 
 
 # Freeze not trainable layers
 for layer in model.layers:
