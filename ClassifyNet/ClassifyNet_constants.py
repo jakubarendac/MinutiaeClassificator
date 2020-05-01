@@ -14,6 +14,8 @@ NUM_CLASSES = 6
 
 INPUT_SHAPE = (224, 224, 3)
 
+BATCH_SIZE = 32
+
 # colors
 RED_COLOR = 'r'
 BLUE_COLOR = 'b'

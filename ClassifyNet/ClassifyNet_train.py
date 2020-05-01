@@ -25,9 +25,11 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import plot_model
 from sklearn.metrics import confusion_matrix
 
-from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import MINUTIAE_CLASSES, NUM_CLASSES
-from MinutiaeClassificator.ClassifyNet.ClassifyNet_model import ClassifyNetModel
-from MinutiaeClassificator.MinutiaeNet.FineNet.FineNet_model import plot_confusion_matrix
+sys.path.append(os.path.abspath('../MinutiaeNet/FineNet'))
+
+from ClassifyNet_constants import MINUTIAE_CLASSES, NUM_CLASSES
+from ClassifyNet_model import ClassifyNetModel
+from FineNet_model import plot_confusion_matrix
 
 output_dir = './output_ClassifyNet/'+datetime.now().strftime('%Y%m%d-%H%M%S')
 
@@ -41,8 +43,8 @@ log_dir = os.path.join(os.getcwd(), output_dir + '/logs')
 batch_size = 32
 epochs = 200
 num_classes = NUM_CLASSES
-train_data_count = 60000
-validation_data_count = 6000
+train_data_count = 48000
+validation_data_count = 12000
 
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
@@ -55,8 +57,8 @@ model_type = 'patch224batch32'
 
 # TODO : before training adjust data paths
 
-train_path = '/home/jakub/projects/Dataset/train/'
-test_path = '/home/jakub/projects/Dataset/validate/'
+train_path = '/home/jakub/projects/classifyNet_trainDataset/new/train/'
+test_path = '/home/jakub/projects/classifyNet_trainDataset/new/validate/'
 
 input_shape = (224, 224, 3)
 
@@ -115,7 +117,7 @@ def lr_schedule(epoch):
 # TODO : before training adjust pretrained path of network
 
 model = ClassifyNetModel(num_classes=num_classes,
-                         pretrained_path='../MinutiaeNet/Models/FineNet.h5',
+                         pretrained_path='/home/jakub/projects/minutiae-extractor/models/FineNet.h5',
                          input_shape=input_shape,
                          load_layers_by_name=True)
 
@@ -151,7 +153,7 @@ print model.summary()
 # ============== End define model ==============
 
 # ============== Other stuffs for loging and parameters ==================
-model_name = 'ClassifyNet_%s_model.{epoch:03d}.h5' % model_type
+model_name = 'ClassifyNet_%s_model.h5' % model_type
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
 if not os.path.isdir(log_dir):

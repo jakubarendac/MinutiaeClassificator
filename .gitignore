@@ -136,3 +136,8 @@ dmypy.json
 
 /output_CoarseNet
 /testData
+
+*.txt
+*.jakub-manjaro
+*.out
+*.png

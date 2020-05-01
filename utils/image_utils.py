@@ -1,10 +1,14 @@
+import sys
+import os
 import cv2
 import io
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-from MinutiaeClassificator.ClassifyNet.ClassifyNet_utils import (getMinutiaeTypeFromId,
+sys.path.append(os.path.realpath('../ClassifyNet'))
+
+from ClassifyNet.ClassifyNet_utils import (getMinutiaeTypeFromId,
                                            setMinutiaePlotColor)
 
 

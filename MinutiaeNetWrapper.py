@@ -1,3 +1,4 @@
+import time
 import cv2
 import numpy as np
 
@@ -7,11 +8,11 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from keras.optimizers import Adam
 
-from MinutiaeClassificator.MinutiaeNet.CoarseNet.MinutiaeNet_utils import FastEnhanceTexture, get_maps_STFT, fuse_nms
-from MinutiaeClassificator.MinutiaeNet.CoarseNet.CoarseNet_utils import label2mnt, py_cpu_nms, nms
-from MinutiaeClassificator.MinutiaeNet.FineNet.FineNet_model import FineNetmodel
-from MinutiaeClassificator.MinutiaeNet.CoarseNet.CoarseNet_model import CoarseNetmodel, fuse_minu_orientation
-from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import PATCH_MINU_RADIO, INPUT_SHAPE
+from MinutiaeNet.CoarseNet.MinutiaeNet_utils import FastEnhanceTexture, get_maps_STFT, fuse_nms
+from MinutiaeNet.CoarseNet.CoarseNet_utils import label2mnt, py_cpu_nms, nms
+from MinutiaeNet.FineNet.FineNet_model import FineNetmodel
+from MinutiaeNet.CoarseNet.CoarseNet_model import CoarseNetmodel, fuse_minu_orientation
+from ClassifyNet.ClassifyNet_constants import PATCH_MINU_RADIO, INPUT_SHAPE
 
 
 class MinutiaeNetWrapper:
@@ -29,7 +30,10 @@ class MinutiaeNetWrapper:
                                 optimizer=Adam(lr=0),
                                 metrics=['accuracy'])
 
-    def extract_minutiae(self, image, original_image):
+    def extract_minutiae(self, image, original_image, should_get_time = False):
+        output = dict()
+        start_time = time.time()
+
         # Generate OF
         texture_img = FastEnhanceTexture(image, sigma=2.5, show=False)
         dir_map, fre_map = get_maps_STFT(
@@ -96,6 +100,8 @@ class MinutiaeNetWrapper:
                     # TODO : add some reasonable code here - programme will fail on next step
                     print(str(e))
 
+                    raise ValueError('OpenCV assertion failed, extraction abort')
+
                 ret = np.empty(
                     (patch_minu.shape[0], patch_minu.shape[1], 3), dtype=np.uint8)
                 ret[:, :, 0] = patch_minu
@@ -124,4 +130,13 @@ class MinutiaeNetWrapper:
 
         fuse_minu_orientation(dir_map, mnt_nms, mode=3)
 
-        return mnt_nms
+        end_time = time.time()
+
+        time_elapsed = end_time - start_time
+
+        output['minutiae'] = mnt_nms
+
+        if should_get_time:
+            output['time_elapsed'] = time_elapsed
+
+        return output

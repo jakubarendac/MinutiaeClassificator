@@ -1,12 +1,13 @@
 import os
 import sys
 import cv2
+import time
 
 import numpy as np
 from keras.optimizers import Adam
 
-from MinutiaeClassificator.ClassifyNet.ClassifyNet_model import ClassifyNetModel
-from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import INPUT_SHAPE, NUM_CLASSES, PATCH_MINU_RADIO
+from ClassifyNet.ClassifyNet_model import ClassifyNetModel
+from ClassifyNet.ClassifyNet_constants import INPUT_SHAPE, NUM_CLASSES, PATCH_MINU_RADIO
 
 
 class ClassifyNetWrapper:
@@ -20,7 +21,11 @@ class ClassifyNetWrapper:
                                    optimizer=Adam(lr=0),
                                    metrics=['accuracy'])
 
-    def classify_minutiae(self, image, extracted_minutiae):
+    def classify_minutiae(self, image, extracted_minutiae, should_get_time = False):
+        output = dict()
+
+        start_time = time.time()
+
         classified_minutiae = []
 
         if extracted_minutiae.size != 0:
@@ -53,5 +58,14 @@ class ClassifyNetWrapper:
                 tmp_mnt[4] = minutiae_type
 
                 classified_minutiae.append(tmp_mnt)
-        
-        return np.array(classified_minutiae)
+
+                end_time = time.time()
+
+        time_elapsed = end_time - start_time
+
+        output['minutiae'] = np.array(classified_minutiae)
+
+        if should_get_time:
+            output['time_elapsed'] = time_elapsed
+
+        return output
