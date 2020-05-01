@@ -136,3 +136,6 @@ dmypy.json
 
 /output_CoarseNet
 /testData
+*.out
+*.out.swp
+*.dual

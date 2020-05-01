@@ -25,9 +25,11 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import plot_model
 from sklearn.metrics import confusion_matrix
 
-from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import MINUTIAE_CLASSES, NUM_CLASSES
-from MinutiaeClassificator.ClassifyNet.ClassifyNet_model import ClassifyNetModel
-from MinutiaeClassificator.MinutiaeNet.FineNet.FineNet_model import plot_confusion_matrix
+sys.path.append(os.path.abspath('../MinutiaeNet/FineNet'))
+
+from ClassifyNet_constants import MINUTIAE_CLASSES, NUM_CLASSES
+from ClassifyNet_model import ClassifyNetModel
+from FineNet_model import plot_confusion_matrix
 
 output_dir = './output_ClassifyNet/'+datetime.now().strftime('%Y%m%d-%H%M%S')
 
@@ -41,8 +43,8 @@ log_dir = os.path.join(os.getcwd(), output_dir + '/logs')
 batch_size = 32
 epochs = 200
 num_classes = NUM_CLASSES
-train_data_count = 60000
-validation_data_count = 6000
+train_data_count = 52800
+validation_data_count = 13200
 
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
@@ -55,8 +57,8 @@ model_type = 'patch224batch32'
 
 # TODO : before training adjust data paths
 
-train_path = '/home/jakub/projects/Dataset/train/'
-test_path = '/home/jakub/projects/Dataset/validate/'
+train_path = '/home/jarendac/projects/dataset/train/'
+test_path = '/home/jarendac/projects/dataset/validate/'
 
 input_shape = (224, 224, 3)
 
@@ -151,7 +153,7 @@ print model.summary()
 # ============== End define model ==============
 
 # ============== Other stuffs for loging and parameters ==================
-model_name = 'ClassifyNet_%s_model.{epoch:03d}.h5' % model_type
+model_name = 'ClassifyNet_%s_model.h5' % model_type
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
 if not os.path.isdir(log_dir):
@@ -192,10 +194,10 @@ model.fit_generator(train_batches,
 
 
 # Plot confusion matrix
-score = model.evaluate_generator(test_batches)
+score = model.evaluate_generator(test_batches, len(test_batches))
 print 'Test accuracy:', score[1]
-predictions = model.predict_generator(test_batches)
+predictions = model.predict_generator(test_batches, len(test_batches))
 test_labels = test_batches.classes[test_batches.index_array]
 
 cm = confusion_matrix(test_labels, np.argmax(predictions, axis=1))
-plot_confusion_matrix(cm, MINUTIAE_CLASSES, title='Confusion Matrix')
+plot_confusion_matrix(cm, MINUTIAE_CLASSES, title='Confusion Matrix', save_image = True)
