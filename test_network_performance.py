@@ -24,13 +24,13 @@ from datetime import datetime
 
 from MinutiaeExtractorWrapper import MinutiaeExtractorWrapper
 
-IMAGE_FOLDER = "/home/jakub/projects/biometric DBs/FVC_Fingerprint_DB/FVC2004/test/"
+IMAGE_FOLDER = "/home/jarendac/projects/biometric_DBs/FVC/FVC2004/DB1_A/"
 
 minutiae_classificator = MinutiaeExtractorWrapper()
 
-minutiae_classificator.get_coarse_net_path('/home/jakub/projects/minutiae-extractor/models/CoarseNet.h5')
-minutiae_classificator.get_fine_net_path('/home/jakub/projects/minutiae-extractor/models/FineNet.h5')
-minutiae_classificator.get_classify_net_path('/home/jakub/projects/minutiae-extractor/models/ClassifyNet.h5')
+minutiae_classificator.get_coarse_net_path('/home/jarendac/projects/MinutiaeClassificator/MinutiaeNet/Models/CoarseNet.h5')
+minutiae_classificator.get_fine_net_path('/home/jarendac/projects/MinutiaeClassificator/MinutiaeNet/Models/FineNet.h5')
+minutiae_classificator.get_classify_net_path('/home/jarendac/projects/MinutiaeClassificator/ClassifyNet/output_ClassifyNet/20200430-004944/ClassifyNet_patch224batch32_model.h5')
 
 minutiae_classificator.load_extraction_module()
 minutiae_classificator.load_classification_module()

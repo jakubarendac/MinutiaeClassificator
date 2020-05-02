@@ -139,5 +139,7 @@ dmypy.json
 
 *.txt
 *.jakub-manjaro
+*.dual
 *.out
+*.out.swp
 *.png
