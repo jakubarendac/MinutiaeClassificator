@@ -7,7 +7,7 @@ from MinutiaeClassificator.ClassifyNetWrapper import ClassifyNetWrapper
 from MinutiaeClassificator.utils.image_utils import read_image, draw_minutiae
 from MinutiaeClassificator.MinutiaeNetWrapper import MinutiaeNetWrapper
 
-class MinutiaeExtractorWrapper:
+class MinutiaeClassificator:
     def __init__(self):
         pass
 
