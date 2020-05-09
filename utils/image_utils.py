@@ -56,3 +56,20 @@ def draw_minutiae(image, minutiae, r = 15, drawScore = False):
     image = Image.open(buf)
 
     return image
+
+def resize_minutiae_patch(minutiae_patch):
+    try:
+        minutiae_patch = cv2.resize(minutiae_patch, dsize=(
+                        224, 224), interpolation=cv2.INTER_NEAREST)
+    except Exception as e:
+        # TODO : add some reasonable code here - programme will fail on next step
+        print(str(e))
+                    
+    ret = np.empty((minutiae_patch.shape[0], minutiae_patch.shape[1], 3), dtype=np.uint8)
+    ret[:, :, 0] = minutiae_patch
+    ret[:, :, 1] = minutiae_patch
+    ret[:, :, 2] = minutiae_patch
+    minutiae_patch = ret
+    minutiae_patch = np.expand_dims(minutiae_patch, axis=0)
+
+    return minutiae_patch

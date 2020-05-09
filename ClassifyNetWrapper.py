@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from keras.optimizers import Adam
 
+from MinutiaeClassificator.utils.image_utils import resize_minutiae_patch
 from MinutiaeClassificator.ClassifyNet.ClassifyNet_model import ClassifyNetModel
 from MinutiaeClassificator.ClassifyNet.ClassifyNet_constants import INPUT_SHAPE, NUM_CLASSES, PATCH_MINU_RADIO
 
@@ -20,6 +21,15 @@ class ClassifyNetWrapper:
                                    optimizer=Adam(lr=0),
                                    metrics=['accuracy'])
 
+    def classify_minutiae_patch(self, minutiae_patch):
+        resized_minutiae_patch = resize_minutiae_patch(minutiae_patch)
+
+        [minutiae_classes] = self.__classifyNet.predict(resized_minutiae_patch)
+        numpy_minutiae_classes = np.array(minutiae_classes)
+        minutiae_type = float(np.argmax(numpy_minutiae_classes))
+        
+        return minutiae_type
+
     def classify_minutiae(self, image, extracted_minutiae):
         classified_minutiae = []
 
@@ -31,23 +41,7 @@ class ClassifyNetWrapper:
                 patch_minu = image[x_begin:x_begin + 2 * PATCH_MINU_RADIO,
                                             y_begin:y_begin + 2 * PATCH_MINU_RADIO]
 
-                try:
-                    patch_minu = cv2.resize(patch_minu, dsize=(
-                        224, 224), interpolation=cv2.INTER_NEAREST)
-                except Exception as e:
-                    # TODO : add some reasonable code here - programme will fail on next step
-                    print(str(e))
-                    
-                ret = np.empty((patch_minu.shape[0], patch_minu.shape[1], 3), dtype=np.uint8)
-                ret[:, :, 0] = patch_minu
-                ret[:, :, 1] = patch_minu
-                ret[:, :, 2] = patch_minu
-                patch_minu = ret
-                patch_minu = np.expand_dims(patch_minu, axis=0)
-
-                [minutiae_classes] = self.__classifyNet.predict(patch_minu)
-                numpy_minutiae_classes = np.array(minutiae_classes)
-                minutiae_type = float(np.argmax(numpy_minutiae_classes))
+                minutiae_type = self.classify_minutiae_patch(patch_minu)
 
                 tmp_mnt = extracted_minutiae[minutiae, :].copy()
                 tmp_mnt[4] = minutiae_type
