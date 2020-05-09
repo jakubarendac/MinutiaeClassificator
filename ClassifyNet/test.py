@@ -26,8 +26,9 @@ from MinutiaeNet_utils import (FastEnhanceTexture, draw_minutiae, fuse_nms,
 
 matplotlib.use('Agg')
 
-coarseNetPath = '../MinutiaeNet/Models/CoarseNet.h5'
-fineNetPath = '../MinutiaeNet/Models/FineNet.h5'
+coarseNetPath = '/home/jakub/projects/minutiae-extractor/models/CoarseNet.h5'
+fineNetPath = '/home/jakub/projects/minutiae-extractor/models/FineNet.h5'
+classifyNetPath = '/home/jakub/projects/minutiae-extractor/models/ClassifyNet_6_classes.h5'
 dataPath = './testData/'
 output_dir = 'output_CoarseNet'
 
@@ -50,7 +51,7 @@ fineNet.compile(loss='categorical_crossentropy',
                 optimizer=Adam(lr=0),
                 metrics=['accuracy'])
 
-classifyNet = ClassifyNetWrapper()
+classifyNet = ClassifyNetWrapper(classifyNetPath)
 
 # Predict images
 for i in xrange(0, len(imgFolder)):
