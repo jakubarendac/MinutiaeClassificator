@@ -217,11 +217,14 @@ def ClassifyNetModel(num_classes=2, pretrained_path=None, input_shape=None, load
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
-                          cmap=plt.cm.Blues):
+                          cmap=plt.cm.Blues,
+                          save_image = False):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
+    fig = plt.figure() 
+
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
@@ -246,4 +249,10 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.show()
+
+    if save_image:
+        plt.savefig(title + '.png')
+        plt.close()
+    
+    else:
+        plt.show()
